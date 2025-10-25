@@ -197,6 +197,9 @@ namespace TON
                     });
             });
 
+            // SignalR
+            builder.Services.AddSignalR();
+
             //
 
             builder.Services.AddScoped<ITicketTypeService, TicketTypeService>();
