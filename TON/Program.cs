@@ -108,7 +108,6 @@ namespace TON
             builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
             builder.Services.AddScoped<IOrganizationService, OrganizationService>();
             builder.Services.AddScoped<IActivityTrackingService, ActivityTrackingService>();
-            builder.Services.AddScoped<IActivityTrackingService, ActivityTrackingService>();
             builder.Services.AddScoped<AnalyticsDataSeeder>();
             builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             builder.Services.AddScoped<IPersonnelSupportService, PersonnelSupportService>();
@@ -200,9 +199,6 @@ namespace TON
 
             //
 
-
-
-            builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<ITicketTypeService, TicketTypeService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -259,7 +255,7 @@ namespace TON
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("SignalRPolicy");
+            app.UseCors("AllowAll");
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
