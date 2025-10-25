@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { CartProvider } from './contexts/CartContext';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
 import ServicesPage from './pages/ServicesPage';
@@ -12,20 +14,24 @@ import ProfilePage from './pages/ProfilePage';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="services" element={<ServicesPage />} />
-          <Route path="events" element={<EventsPage />} />
-          <Route path="tedx-vietnam" element={<EventsPage />} />
-          <Route path="merchandise" element={<MerchandisePage />} />
-          <Route path="tickets" element={<EventsPage />} />
-          <Route path="partners" element={<PartnersPage />} />
-          <Route path="cart" element={<CartPage />} />
-          <Route path="checkout" element={<CheckoutPage />} />
-          <Route path="profile" element={<ProfilePage />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="services" element={<ServicesPage />} />
+              <Route path="events" element={<EventsPage />} />
+              <Route path="tedx-vietnam" element={<EventsPage />} />
+              <Route path="merchandise" element={<MerchandisePage />} />
+              <Route path="tickets" element={<EventsPage />} />
+              <Route path="partners" element={<PartnersPage />} />
+              <Route path="cart" element={<CartPage />} />
+              <Route path="checkout" element={<CheckoutPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

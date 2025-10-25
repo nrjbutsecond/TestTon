@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User } from 'lucide-react';
+import { Search, ShoppingCart, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, isAuthenticated, logout } = useAuth();
+  const { getCartCount } = useCart();
+
+  const cartCount = getCartCount();
 
   return (
     <header className="bg-black text-white sticky top-0 z-50">
@@ -56,12 +62,58 @@ const Header = () => {
 
           {/* Icons */}
           <div className="flex items-center space-x-4">
-            <Link to="/cart" className="hover:text-primary transition-colors">
+            {/* Cart Icon with Badge */}
+            <Link to="/cart" className="hover:text-primary transition-colors relative">
               <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </Link>
-            <Link to="/profile" className="hover:text-primary transition-colors">
-              <User className="w-5 h-5" />
-            </Link>
+
+            {/* User Menu */}
+            {isAuthenticated ? (
+              <div className="relative group">
+                <button className="hover:text-primary transition-colors flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  <span className="text-sm hidden lg:block">{user?.fullName || user?.email}</span>
+                </button>
+
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white text-black rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    My Orders
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-lg flex items-center gap-2 text-red-600"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="hover:text-primary transition-colors">
+                <User className="w-5 h-5" />
+              </Link>
+            )}
           </div>
         </div>
       </div>

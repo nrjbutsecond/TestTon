@@ -1,9 +1,11 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, Heart, ArrowLeft, ShoppingCart, Lock, RotateCcw } from 'lucide-react';
+import { useCart } from '../hooks/useCart';
+import { useState } from 'react';
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState([
+  const { cartItems, updateQuantity: updateQty, removeFromCart: removeItem, loading } = useCart();
+  const [localCartItems] = useState([
     {
       id: 1,
       type: 'product',
@@ -48,22 +50,22 @@ const CartPage = () => {
 
   const [promoCode, setPromoCode] = useState('');
 
-  const updateQuantity = (id, change) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+  // Use real cart or fallback to demo cart
+  const displayItems = cartItems.length > 0 ? cartItems : localCartItems;
+
+  const updateQuantity = async (id, change) => {
+    const item = displayItems.find(i => i.id === id);
+    if (item) {
+      await updateQty(id, item.quantity + change);
+    }
   };
 
-  const removeItem = (id) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+  const handleRemoveItem = async (id) => {
+    await removeItem(id);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalSavings = cartItems.reduce((sum, item) =>
+  const subtotal = displayItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalSavings = displayItems.reduce((sum, item) =>
     sum + ((item.originalPrice || item.price) - item.price) * item.quantity, 0);
   const shipping = 0; // Free shipping
   const tax = Math.round(subtotal * 0.1); // 10% tax
@@ -104,7 +106,14 @@ const CartPage = () => {
           </div>
         </div>
 
-        {cartItems.length === 0 ? (
+        {loading && (
+          <div className="text-center py-16">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-primary"></div>
+            <p className="mt-4 text-gray-600">Loading cart...</p>
+          </div>
+        )}
+
+        {!loading && displayItems.length === 0 ? (
           <div className="text-center py-16 card max-w-md mx-auto">
             <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
@@ -119,7 +128,7 @@ const CartPage = () => {
             <div className="lg:col-span-2 space-y-4">
               <div className="card">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-bold">Shopping Cart ({cartItems.length} items)</h2>
+                  <h2 className="text-xl font-bold">Shopping Cart ({displayItems.length} items)</h2>
                   <p className="text-sm text-gray-600 mt-1">
                     Your cart will be saved for 30 minutes.
                     <Link to="/register" className="text-primary hover:underline ml-1">
@@ -129,7 +138,7 @@ const CartPage = () => {
                 </div>
 
                 <div className="divide-y">
-                  {cartItems.map((item) => (
+                  {displayItems.map((item) => (
                     <div key={item.id} className="p-6">
                       <div className="flex gap-4">
                         {/* Product Image */}
@@ -157,7 +166,7 @@ const CartPage = () => {
                               <p className="text-sm text-gray-600">by {item.brand}</p>
                             </div>
                             <button
-                              onClick={() => removeItem(item.id)}
+                              onClick={() => handleRemoveItem(item.id)}
                               className="text-gray-400 hover:text-red-500 h-fit"
                             >
                               <Trash2 className="w-5 h-5" />
